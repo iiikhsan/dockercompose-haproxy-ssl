@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  tcserv:
+   image: tomct1
+   ports:
+     - 8080
+   environment:
+     - SERVICE_PORTS=8080
+   deploy:
+     replicas: 2
+     update_config:
+       parallelism: 5
+       delay: 10s
+     restart_policy:
+       condition: on-failure
+       max_attempts: 3
+       window: 120s
+   networks:
+     - web
+
+  proxy:
+    image: dockercloud/haproxy
+    depends_on:
+      - tcserv
+    environment:
+      - BALANCE=leastconn
+      - CERT_FOLDER=/host-certs/
+      - VIRTUAL_HOST=https://*
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /certs:/host-certs
+    ports:
+      - 443:443
+      - 80:80
+    networks:
+      - web
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+networks:
+  web:
+    driver: overlay
