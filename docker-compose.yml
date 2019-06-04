@@ -2,11 +2,13 @@ version: '3'
 
 services:
   tcserv:
-   image: tomct1
+   image: tombase
    ports:
      - 8080
    environment:
      - SERVICE_PORTS=8080
+   volumes:
+     - /logs:/usr/local/tomcat/logs
    deploy:
      replicas: 2
      update_config:
@@ -27,6 +29,9 @@ services:
       - BALANCE=leastconn
       - CERT_FOLDER=/host-certs/
       - VIRTUAL_HOST=https://*
+      - RSYSLOG_DESTINATION=10.0.0.6:514
+      - EXTRA_GLOBAL_SETTINGS="debug"
+
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /certs:/host-certs
