@@ -30,8 +30,10 @@ services:
       - BALANCE=leastconn
       - CERT_FOLDER=/host-certs/
       - VIRTUAL_HOST=https://*
-      - RSYSLOG_DESTINATION=your.host.IP.Address:514
+      - RSYSLOG_DESTINATION=10.0.0.6:514
       - EXTRA_GLOBAL_SETTINGS="debug"
+      - EXTRA_FRONTEND_SETTINGS_443=http-response set-header Strict-Transport-Security "max-age=63072000; includeSubdomains; preload",http-response set-header X-Xss-Protection "1; mode=block",http-response set-header X-Content-Type-Options "nosniff",http-response set-header Referrer-
+Policy "no-referrer-when-downgrade",http-response set-header Content-Security-Policy "default-src 'self' 'unsafe-inline' www.google-analytics.com"
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
