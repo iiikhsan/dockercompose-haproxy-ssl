@@ -8,8 +8,9 @@ services:
    environment:
      - SERVICE_PORTS=8080
    volumes:
-     - /home/surfer/labs/dockers/ssl-termination/webapps:/usr/local/tomcat/webapps/	
-     - /logs:/usr/local/tomcat/logs
+     - /app/webapps:/usr/local/tomcat/webapps/
+     - /app/logs:/usr/local/tomcat/logs
+     - /app/conf/tomcat/server.xml:/usr/local/tomcat/conf/server.xml
    deploy:
      replicas: 10
      update_config:
@@ -31,13 +32,11 @@ services:
       - CERT_FOLDER=/host-certs/
       - VIRTUAL_HOST=https://*
       - RSYSLOG_DESTINATION=10.0.0.6:514
-      - EXTRA_GLOBAL_SETTINGS="debug"
-      - EXTRA_FRONTEND_SETTINGS_443=http-response set-header Strict-Transport-Security "max-age=63072000; includeSubdomains; preload",http-response set-header X-Xss-Protection "1; mode=block",http-response set-header X-Content-Type-Options "nosniff",http-response set-header Referrer-
-Policy "no-referrer-when-downgrade",http-response set-header Content-Security-Policy "default-src 'self' 'unsafe-inline' www.google-analytics.com"
+      - EXTRA_GLOBAL_SETTINGS=ssl-default-bind-options no-tlsv10
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /certs:/host-certs
+      - /app/certs/haproxy:/host-certs
     ports:
       - 443:443
       - 80:80
